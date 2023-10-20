@@ -3,60 +3,30 @@ package com.example.eletriccarapp.presentation.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.widget.ViewPager2
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.example.eletriccarapp.R
-import com.example.eletriccarapp.presentation.adapter.CarAdapter
-import com.example.eletriccarapp.presentation.adapter.TabAdapter
-import com.example.eletriccarapp.presentation.data.CarFactory
-import com.google.android.material.tabs.TabLayout
+import com.example.eletriccarapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var tabLayout: TabLayout
-    lateinit var viewPager: ViewPager2
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
-        setupView()
-        setupTabs()
+        // Buscar ele pelo R.id... porque esta em uma activity, em um fragment nao precisa
+        val navController = findNavController(R.id.nav_host_fragment)
+        setupWithNavController(binding.bottomNavigation, navController)
+
+        setupListeners()
     }
 
-    fun setupView() {
-        tabLayout = findViewById(R.id.tab_layout)
-        viewPager = findViewById(R.id.vp_view_pager)
+    private fun setupListeners() {
+        binding.fabCalcular.setOnClickListener {
+            startActivity(Intent(this, CalcularAutonomiaActivity::class.java))
+        }
     }
 
-    fun setupTabs() {
-        val tabsAdapter = TabAdapter(this)
-        viewPager.adapter = tabsAdapter
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            // Quando a tab for selecionada
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.let {
-                    viewPager.currentItem = it.position
-                }
-            }
-
-            // Quando não for selecionada
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
-
-            // Quando der um reselect nela
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
-        // Para que ao fragment ser ARRASTADO, a Tab vá junto
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                tabLayout.getTabAt(position)?.select()
-            }
-        })
-    }
 }
